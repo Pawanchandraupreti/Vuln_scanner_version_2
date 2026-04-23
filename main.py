@@ -25,7 +25,6 @@ from datetime import datetime
 
 from scanner import NetworkVulnScanner, get_local_network, SEVERITY_ORDER
 
-
 # ── Terminal colors (no external deps) ───────────────────────────────────────
 
 RESET  = "\033[0m"
