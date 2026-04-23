@@ -362,3 +362,5 @@ def generate_report(devices: list, output_path: str = "vulnerability_report.pdf"
     doc.build(story, onFirstPage=dark_page, onLaterPages=dark_page)
     print(f"[+] Report saved: {output_path}")
     return output_path
+
+    
