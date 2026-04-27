@@ -10,24 +10,146 @@ a professional PDF security report — exactly what small businesses pay for.
 - Detects open ports and identifies running services + versions
 - Rates each finding: `CRITICAL / HIGH / MEDIUM / LOW`
 - Gives specific remediation advice per vulnerability
-- Outputs a clean, dark-themed PDF report
+- Outputs a clean, dark-themed PDF report (optional)
 
 ## Installation
 
+### Quick Setup (Windows)
 ```bash
-# 1. Install nmap (required system tool)
-sudo apt install nmap          # Ubuntu/Debian
-brew install nmap              # macOS
+# Run the setup script
+setup.bat
+```
 
-# 2. Install Python dependencies
+### Manual Setup
+```bash
+# 1. Create virtual environment
+python -m venv venv
+
+# 2. Activate virtual environment
+# On Windows:
+venv\Scripts\activate
+# On Linux/macOS:
+source venv/bin/activate
+
+# 3. Install dependencies
+pip install -r requirements.txt
+```
+
+### Full Installation (with nmap for advanced features)
+```bash
+# Install nmap system tool
+# Linux: sudo apt install nmap
+# macOS: brew install nmap
+# Windows: https://nmap.org/download.html
+
+# Then install Python dependencies
 pip install -r requirements.txt
 ```
 
 ## Usage
 
 ```bash
-# Auto-detect your subnet and scan
-sudo python main.py
+# Basic scan (auto-detect your subnet)
+python main.py
+
+# Scan specific target
+python main.py --target 192.168.1.0/24
+python main.py --target 192.168.1.100
+
+# Scan specific ports only
+python main.py --target 192.168.1.0/24 --ports 22,80,443,3306
+
+# Skip PDF generation
+python main.py --no-report
+
+# Also save results as JSON
+python main.py --json
+
+# Custom output PDF name
+python main.py --output my_report.pdf
+```
+
+## Features
+
+### Scanning Modes
+- **nmap mode** (when nmap is installed): Full-featured scanning with version detection
+- **Socket mode** (fallback): Works without nmap, uses Python socket connections
+
+### Supported Operating Systems
+- Windows (tested with Python 3.14)
+- Linux
+- macOS
+
+### Port Analysis
+The scanner checks for known risky services on common ports including:
+- 21-25: FTP, SSH, Telnet, SMTP
+- 80, 443: HTTP, HTTPS
+- 3306, 5432, 27017: Databases
+- 3389, 5900, 6379: Remote access and caches
+- And many more...
+
+## Examples
+
+### Scan your entire network
+```bash
+python main.py
+```
+Output:
+```
+VULNSCAN - Local Network Vulnerability Scanner
+=================================================
+
+[*] Scanning network: 192.168.1.0/24
+[*] Ports: 21-25,53,80,...
+
+─────────────────────────────────────────────────
+  192.168.1.50   (myserver.local)
+  OS     : Ubuntu 20.04 LTS
+  Ports  : 22, 80, 443
+  Risk   : HIGH
+
+  PORT    SERVICE          SEVERITY   RECOMMENDATION
+  ───────────────────────────────────────────────
+  22      SSH             LOW        Secure if updated...
+  80      HTTP            MEDIUM     Unencrypted web traffic...
+  443     HTTPS           LOW        Encrypted web...
+```
+
+## Troubleshooting
+
+### "nmap not found" warning
+This is normal! The scanner will fall back to Python-based socket scanning.
+For full scanning with version detection, install nmap.
+
+### "No active hosts found"
+- Check your target IP range is correct
+- Verify network connectivity
+- Try pinging the target manually
+
+### Unicode/encoding errors (Windows)
+These have been fixed in the latest version. If you encounter any, report them.
+
+## Requirements
+
+**Core:**
+- Python 3.7+
+- python-nmap (optional, falls back to socket scanning)
+
+**System:**
+- nmap (optional, for advanced features)
+
+**Optional:**
+- reportlab (for PDF generation)
+
+## License
+
+MIT
+
+## Author
+
+Pawan Chandra Upreti
+GitHub: https://github.com/Pawanchandraupreti
+
 
 # Scan a specific subnet
 sudo python main.py --target 192.168.1.0/24
