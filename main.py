@@ -1,6 +1,6 @@
 """
 Local Network Vulnerability Scanner
-────────────────────────────────────
+====================================
 Usage:
     python main.py                        # Auto-detect subnet, scan common ports
     python main.py --target 192.168.1.0/24
@@ -48,13 +48,9 @@ SEV_TERM = {
 
 BANNER = f"""
 {CYAN}{BOLD}
- ██╗   ██╗██╗   ██╗██╗     ███╗   ██╗███████╗ ██████╗ █████╗ ███╗   ██╗
- ██║   ██║██║   ██║██║     ████╗  ██║██╔════╝██╔════╝██╔══██╗████╗  ██║
- ██║   ██║██║   ██║██║     ██╔██╗ ██║███████╗██║     ███████║██╔██╗ ██║
- ╚██╗ ██╔╝██║   ██║██║     ██║╚██╗██║╚════██║██║     ██╔══██║██║╚██╗██║
-  ╚████╔╝ ╚██████╔╝███████╗██║ ╚████║███████║╚██████╗██║  ██║██║ ╚████║
-   ╚═══╝   ╚═════╝ ╚══════╝╚═╝  ╚═══╝╚══════╝ ╚═════╝╚═╝  ╚═╝╚═╝  ╚═══╝
-{RESET}{GRAY}  Local Network Vulnerability Scanner  |  github.com/Pawanchandraupreti{RESET}
+ VULNSCAN - Local Network Vulnerability Scanner
+ =================================================
+{RESET}{GRAY}  github.com/Pawanchandraupreti{RESET}
 """
 
 
@@ -69,7 +65,7 @@ def sev_badge(sev: str) -> str:
 
 def print_device(device: dict):
     risk_col = SEV_TERM.get(device["risk"], BLUE)
-    print(f"\n{BOLD}{WHITE}{'─'*65}{RESET}")
+    print(f"\n{BOLD}{WHITE}{'-'*65}{RESET}")
     print(f"  {BOLD}{WHITE}{device['ip']}{RESET}  {GRAY}({device['hostname']}){RESET}")
     print(f"  OS     : {GRAY}{device['os']}{RESET}")
     print(f"  Ports  : {CYAN}{', '.join(str(p) for p in device['open_ports']) or 'None'}{RESET}")
@@ -80,7 +76,7 @@ def print_device(device: dict):
         return
 
     print(f"\n  {'PORT':<8}{'SERVICE':<16}{'SEVERITY':<12}RECOMMENDATION")
-    print(f"  {GRAY}{'─'*60}{RESET}")
+    print(f"  {GRAY}{'-'*60}{RESET}")
 
     for f in device["findings"]:
         col = SEV_TERM.get(f["severity"], BLUE)
@@ -97,15 +93,15 @@ def print_summary(devices: list):
         for f in d["findings"]:
             counts[f["severity"]] = counts.get(f["severity"], 0) + 1
 
-    print(f"\n{BOLD}{WHITE}{'═'*65}{RESET}")
+    print(f"\n{BOLD}{WHITE}{'='*65}{RESET}")
     print(f"{BOLD}{WHITE}  SCAN SUMMARY{RESET}")
-    print(f"{BOLD}{WHITE}{'═'*65}{RESET}")
+    print(f"{BOLD}{WHITE}{'='*65}{RESET}")
     print(f"  Devices scanned : {CYAN}{BOLD}{len(devices)}{RESET}")
     print(f"  {RED}{BOLD}Critical{RESET}        : {RED}{BOLD}{counts['CRITICAL']}{RESET}")
     print(f"  {ORANGE}{BOLD}High{RESET}            : {ORANGE}{BOLD}{counts['HIGH']}{RESET}")
     print(f"  {YELLOW}{BOLD}Medium{RESET}          : {YELLOW}{BOLD}{counts['MEDIUM']}{RESET}")
     print(f"  {GREEN}{BOLD}Low{RESET}             : {GREEN}{BOLD}{counts['LOW']}{RESET}")
-    print(f"{BOLD}{WHITE}{'═'*65}{RESET}\n")
+    print(f"{BOLD}{WHITE}{'='*65}{RESET}\n")
 
 
 def save_json(devices: list, path: str):
