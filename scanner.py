@@ -70,14 +70,22 @@ def resolve_hostname(ip: str) -> str:
 
 class NetworkVulnScanner:
     def __init__(self, target: Optional[str] = None):
-        self.nm = nmap.PortScanner()
         self.target = target or get_local_network()
         self.results = []
         self.scan_time = None
+        self.use_nmap = True
+        
+        try:
+            self.nm = nmap.PortScanner()
+        except nmap.PortScannerError:
+            print("[!] nmap not found. Using Python-based socket scanning (limited mode).")
+            print("[!] For full scanning, install nmap: https://nmap.org/download.html")
+            self.use_nmap = False
+            self.nm = None
 
     def scan(self, ports: str = "21-25,53,80,110,135,139,143,443,445,1433,1521,3306,3389,5432,5900,6379,8080,8443,27017") -> list:
         """
-        Run the scan.
+        Run the scan using nmap or fallback to Python socket scanning.
         -sV  : version detection
         -O   : OS detection (needs root)
         -T4  : aggressive timing
@@ -89,6 +97,13 @@ class NetworkVulnScanner:
 
         self.scan_time = datetime.now()
 
+        if self.use_nmap:
+            return self._scan_with_nmap(ports)
+        else:
+            return self._scan_with_sockets(ports)
+
+    def _scan_with_nmap(self, ports: str) -> list:
+        """Scan using nmap."""
         try:
             self.nm.scan(
                 hosts=self.target,
@@ -102,6 +117,88 @@ class NetworkVulnScanner:
 
         self.results = self._parse_results()
         return self.results
+
+    def _scan_with_sockets(self, ports: str) -> list:
+        """Fallback scanning using Python sockets (limited functionality)."""
+        port_list = self._parse_port_string(ports)
+        devices = []
+        
+        # Parse target to see if it's a single host or a subnet
+        try:
+            network = ipaddress.ip_network(self.target, strict=False)
+            hosts_to_scan = list(network.hosts()) if network.num_addresses > 2 else [network.network_address]
+        except:
+            # Single host
+            try:
+                hosts_to_scan = [ipaddress.ip_address(self.target)]
+            except:
+                print(f"[!] Invalid target: {self.target}")
+                return []
+        
+        for host_ip in hosts_to_scan:
+            hostname = resolve_hostname(str(host_ip))
+            open_ports = []
+            findings = []
+            
+            for port in port_list:
+                if self._check_port(str(host_ip), port):
+                    open_ports.append(port)
+                    
+                    if port in RISKY_PORTS:
+                        name, severity, advice = RISKY_PORTS[port]
+                        findings.append({
+                            "port": port,
+                            "service": name,
+                            "detected_version": "Unknown (no version detection in socket mode)",
+                            "severity": severity,
+                            "advice": advice,
+                        })
+                    else:
+                        findings.append({
+                            "port": port,
+                            "service": f"Service on port {port}",
+                            "detected_version": "Unknown",
+                            "severity": "INFO",
+                            "advice": "Non-standard port open. Verify this is intentional.",
+                        })
+            
+            if open_ports:  # Only add hosts with open ports
+                findings.sort(key=lambda x: SEVERITY_ORDER.get(x["severity"], 99))
+                risk = _device_risk(findings)
+                
+                devices.append({
+                    "ip": str(host_ip),
+                    "hostname": hostname,
+                    "os": "Unknown",
+                    "open_ports": open_ports,
+                    "findings": findings,
+                    "risk": risk,
+                })
+        
+        devices.sort(key=lambda d: SEVERITY_ORDER.get(d["risk"], 99))
+        self.results = devices
+        return devices
+
+    def _parse_port_string(self, ports: str) -> list:
+        """Parse port specification like '80,443,22-25' into a list of ports."""
+        port_list = []
+        for part in ports.split(','):
+            if '-' in part:
+                start, end = map(int, part.split('-'))
+                port_list.extend(range(start, end + 1))
+            else:
+                port_list.append(int(part.strip()))
+        return sorted(list(set(port_list)))
+
+    def _check_port(self, host: str, port: int, timeout: float = 0.5) -> bool:
+        """Check if a port is open on a host."""
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.settimeout(timeout)
+        try:
+            result = sock.connect_ex((host, port))
+            return result == 0
+        finally:
+            sock.close()
 
     def _parse_results(self) -> list:
         devices = []
