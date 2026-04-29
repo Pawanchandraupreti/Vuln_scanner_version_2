@@ -216,6 +216,7 @@ def build_findings_table(findings, styles):
         ("FONTNAME",      (0, 0), (-1, 0), "Helvetica-Bold"),
         ("FONTSIZE",      (0, 0), (-1, 0), 8),
         ("ALIGN",         (0, 0), (-1, 0), "LEFT"),
+        
         # Body
         ("FONTSIZE",      (0, 1), (-1, -1), 8),
         ("VALIGN",        (0, 0), (-1, -1), "TOP"),
