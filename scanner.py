@@ -275,3 +275,5 @@ def _device_risk(findings: list) -> str:
     return "INFO"
 
     
+
+    
