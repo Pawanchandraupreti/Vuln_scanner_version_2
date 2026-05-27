@@ -1,3 +1,6 @@
 python-nmap>=0.7.1
 # reportlab is optional for PDF generation - install only if needed:
 # pip install reportlab pillow
+
+
+ 
