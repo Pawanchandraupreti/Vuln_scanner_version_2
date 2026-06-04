@@ -274,3 +274,4 @@ def _device_risk(findings: list) -> str:
             return level
     return "INFO"
 
+
