@@ -53,7 +53,6 @@ BANNER = f"""
 {RESET}{GRAY}  github.com/Pawanchandraupreti{RESET}
 """
 
-
 def print_banner():
     print(BANNER)
 
