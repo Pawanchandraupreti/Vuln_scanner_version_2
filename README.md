@@ -228,3 +228,4 @@ vuln_scanner/
 
 Only scan networks you own or have explicit permission to test.
 Unauthorized scanning may be illegal in your jurisdiction.
+
