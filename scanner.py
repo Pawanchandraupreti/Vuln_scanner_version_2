@@ -54,7 +54,6 @@ def get_local_network() -> str:
         ip = s.getsockname()[0]
     finally:
         s.close()
-    # Assume /24 subnet (works for most home/office networks)
     parts = ip.rsplit(".", 1)
     return f"{parts[0]}.0/24"
 
@@ -162,7 +161,7 @@ class NetworkVulnScanner:
                             "advice": "Non-standard port open. Verify this is intentional.",
                         })
             
-            if open_ports:  # Only add hosts with open ports
+            if open_ports:  
                 findings.sort(key=lambda x: SEVERITY_ORDER.get(x["severity"], 99))
                 risk = _device_risk(findings)
                 
@@ -207,7 +206,6 @@ class NetworkVulnScanner:
             hostname = resolve_hostname(host)
             os_info = "Unknown"
 
-            # Try to get OS info if available
             if "osmatch" in self.nm[host] and self.nm[host]["osmatch"]:
                 os_info = self.nm[host]["osmatch"][0].get("name", "Unknown")
 
