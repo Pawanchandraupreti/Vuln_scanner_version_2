@@ -61,7 +61,6 @@ def sev_badge(sev: str) -> str:
     col = SEV_TERM.get(sev, BLUE)
     return f"{col}{BOLD}[{sev}]{RESET}"
 
-
 def print_device(device: dict):
     risk_col = SEV_TERM.get(device["risk"], BLUE)
     print(f"\n{BOLD}{WHITE}{'-'*65}{RESET}")
@@ -167,7 +166,6 @@ def main():
             print(f"{RED}[!] PDF generation failed: {e}{RESET}")
 
     print(f"\n{GRAY}Done. Stay secure.{RESET}\n")
-
 
 if __name__ == "__main__":
     main() 
