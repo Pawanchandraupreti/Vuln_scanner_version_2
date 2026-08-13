@@ -18,6 +18,7 @@ echo Installing dependencies...
 python -m pip install -r requirements.txt --upgrade
 
 REM Done
+
 echo.
 echo Setup complete! Run scanner with:
 echo   python main.py --help
