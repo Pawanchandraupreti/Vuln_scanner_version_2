@@ -24,3 +24,4 @@ echo Setup complete! Run scanner with:
 echo   python main.py --help
 echo   python main.py --target 127.0.0.1 --no-report
 echo. 
+
