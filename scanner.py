@@ -271,3 +271,5 @@ def _device_risk(findings: list) -> str:
         if level in severities:
             return level
     return "INFO"
+
+
