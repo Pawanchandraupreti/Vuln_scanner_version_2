@@ -364,3 +364,5 @@ def generate_report(devices: list, output_path: str = "vulnerability_report.pdf"
     print(f"[+] Report saved: {output_path}")
     return output_path
     
+
+    
